@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "908715493502",
+    "project_id": "fooddexpress24",
+    "storage_bucket": "fooddexpress24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:908715493502:android:9566a4c5a34bb99de4702f",
+        "android_client_info": {
+          "package_name": "com.example.food_express"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUYkuIauFZN3yjP0xrQCDlqoXZAhEI8Zo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
