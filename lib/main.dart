@@ -13,7 +13,7 @@ void main() {
         // theme provider
 
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        // Restaurant provider
+        // Restaurant providers
 
         ChangeNotifierProvider(create: (context) => Restaurant()),
       ],
