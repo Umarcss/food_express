@@ -331,33 +331,26 @@ class Restaurant extends ChangeNotifier {
   final List<CartItem> _cart = [];
 
   // add to cart
-  void addToCart(Food food, List<Addon> selectedAddons) {
-    // see if there is a cart item with the same food and selected addons
+  void addToCart(Food food, List<Addon> selectedAddons, [int quantity = 1]) {
+    // see if the item is already in cart
     CartItem? cartItem = _cart.firstWhereOrNull((item) {
-      // check if the food items  are thesame
+      // check if the food items are the same
       bool isSameFood = item.food == food;
 
-      // check if the list of selectedAddons are thesame
+      // check if the list of selected addons are the same
       bool isSameAddons =
-          ListEquality().equals(item.selectedAddons, selectedAddons);
+          const ListEquality().equals(item.selectedAddons, selectedAddons);
 
       return isSameFood && isSameAddons;
     });
 
-    // if item already exists, increse it's quantity
     if (cartItem != null) {
-      cartItem.quantity++;
-    }
-
-    // otherwise, add a new cart  item  to the cart
-
-    else {
-      _cart.add(
-        CartItem(
-          food: food,
-          selectedAddons: selectedAddons,
-        ),
-      );
+      // if the item is already in cart, increase the quantity
+      cartItem.quantity += quantity;
+    } else {
+      // if the item is not in cart, add it
+      _cart.add(CartItem(
+          food: food, selectedAddons: selectedAddons, quantity: quantity));
     }
 
     notifyListeners();
@@ -379,20 +372,11 @@ class Restaurant extends ChangeNotifier {
   }
 
   // get total price of cart
-
-  double getTotalPrice() {
-    double total = 0.0;
-
-    for (CartItem cartItem in _cart) {
-      double itemTotal = cartItem.food.price;
-
-      for (Addon addon in cartItem.selectedAddons) {
-        itemTotal += addon.price;
-      }
-
-      total += itemTotal * cartItem.quantity;
+  double get totalPrice {
+    double total = 0;
+    for (CartItem item in _cart) {
+      total += item.totalPrice;
     }
-
     return total;
   }
 
@@ -445,7 +429,7 @@ HELPERS
     reciept.writeln("---------");
     reciept.writeln();
     reciept.writeln("Total Items: ${getTotalItemCount()}");
-    reciept.writeln("price Items: ${_formatPrice(getTotalPrice())}");
+    reciept.writeln("price Items: ${_formatPrice(totalPrice)}");
 
     return reciept.toString();
   }
