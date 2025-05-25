@@ -79,11 +79,11 @@ class _CartPageState extends State<CartPage>
               restaurant.clearCart();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Row(
+                  content: const Row(
                     children: [
-                      const Icon(Icons.check_circle, color: Colors.white),
-                      const SizedBox(width: 8),
-                      const Text('Cart cleared'),
+                      Icon(Icons.check_circle, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text('Cart cleared'),
                     ],
                   ),
                   backgroundColor: Theme.of(context).colorScheme.primary,
@@ -237,7 +237,7 @@ class _CartPageState extends State<CartPage>
                                 ),
                               ),
                               Text(
-                                "\N${total.toStringAsFixed(2)}",
+                                "N${total.toStringAsFixed(2)}",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -257,7 +257,7 @@ class _CartPageState extends State<CartPage>
                                 ),
                               ),
                               Text(
-                                "\N${(total * 0.1).toStringAsFixed(2)}",
+                                "N${(total * 0.1).toStringAsFixed(2)}",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -277,7 +277,7 @@ class _CartPageState extends State<CartPage>
                                 ),
                               ),
                               Text(
-                                "\N${(total * 1.1).toStringAsFixed(2)}",
+                                "N${(total * 1.1).toStringAsFixed(2)}",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,

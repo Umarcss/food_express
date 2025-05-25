@@ -171,7 +171,7 @@ class _FoodPageState extends State<FoodPage> with SingleTickerProviderStateMixin
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      '\N${widget.food.price}',
+                                      'N${widget.food.price}',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20,
@@ -227,7 +227,7 @@ class _FoodPageState extends State<FoodPage> with SingleTickerProviderStateMixin
                                       ),
                                     ),
                                     subtitle: Text(
-                                      '\N${addon.price}',
+                                      'N${addon.price}',
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.primary,
                                       ),

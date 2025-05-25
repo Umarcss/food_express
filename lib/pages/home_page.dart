@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:food_express/components/current_location.dart';
 import 'package:food_express/components/descrition_box.dart';

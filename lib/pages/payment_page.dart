@@ -80,12 +80,23 @@ class _PaymentPageState extends State<PaymentPage>
               _buildDetailRow("Expiry Date", expiryDate),
               _buildDetailRow("Card Holder", cardHolderName),
               const SizedBox(height: 16),
-              Text(
-                "Total Amount: \N${context.read<Restaurant>().totalPrice.toStringAsFixed(2)}",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontSize: 18,
+              Consumer<Restaurant>(
+                builder: (context, restaurant, child) => Column(
+                  children: [
+                    _buildDetailRow("Subtotal",
+                        "\N${restaurant.totalPrice.toStringAsFixed(2)}"),
+                    _buildDetailRow("Delivery Fee",
+                        "\N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
+                    const Divider(height: 16),
+                    Text(
+                      "Total Amount: \N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -199,89 +210,97 @@ class _PaymentPageState extends State<PaymentPage>
         opacity: _fadeAnimation,
         child: SlideTransition(
           position: _slideAnimation,
-          child: Column(
-            children: [
-              // Order summary
-              Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Order Summary",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Column(
+                children: [
+                  // Order summary
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary
+                          .withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    const SizedBox(height: 8),
-                    Consumer<Restaurant>(
-                      builder: (context, restaurant, child) => Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text("Subtotal"),
-                              Text(
-                                  "\N${restaurant.totalPrice.toStringAsFixed(2)}"),
-                            ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Order Summary",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        ),
+                        const SizedBox(height: 8),
+                        Consumer<Restaurant>(
+                          builder: (context, restaurant, child) => Column(
                             children: [
-                              const Text("Delivery Fee"),
-                              Text(
-                                  "\N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
-                            ],
-                          ),
-                          const Divider(height: 16),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                "Total",
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Subtotal"),
+                                  Text(
+                                      "\N${restaurant.totalPrice.toStringAsFixed(2)}"),
+                                ],
                               ),
-                              Text(
-                                "\N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
+                              const SizedBox(height: 4),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Delivery Fee"),
+                                  Text(
+                                      "\N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
+                                ],
+                              ),
+                              const Divider(height: 16),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Total",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    "\N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
-              // Credit card widget
-              CreditCardWidget(
-                cardNumber: cardNumber,
-                expiryDate: expiryDate,
-                cardHolderName: cardHolderName,
-                cvvCode: cvvCode,
-                showBackView: isCvvFocused,
-                onCreditCardWidgetChange: (p0) {},
-                cardBgColor: Theme.of(context).colorScheme.primary,
-                textStyle: const TextStyle(color: Colors.white),
-                cardType: CardType.visa,
-              ),
+                  // Credit card widget
+                  CreditCardWidget(
+                    cardNumber: cardNumber,
+                    expiryDate: expiryDate,
+                    cardHolderName: cardHolderName,
+                    cvvCode: cvvCode,
+                    showBackView: isCvvFocused,
+                    onCreditCardWidgetChange: (p0) {},
+                    cardBgColor: Theme.of(context).colorScheme.primary,
+                    textStyle: const TextStyle(color: Colors.white),
+                    cardType: CardType.visa,
+                  ),
 
-              // Credit card form
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
+                  // Credit card form
+                  Padding(
                     padding: const EdgeInsets.all(16),
                     child: CreditCardForm(
                       cardNumber: cardNumber,
@@ -300,20 +319,20 @@ class _PaymentPageState extends State<PaymentPage>
                       formKey: formKey,
                     ),
                   ),
-                ),
-              ),
 
-              // Pay button
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: _isProcessing
-                    ? const CircularProgressIndicator()
-                    : MyButton(
-                        onTap: userTappedPay,
-                        text: "Pay Now",
-                      ),
+                  // Pay button
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: _isProcessing
+                        ? const CircularProgressIndicator()
+                        : MyButton(
+                            onTap: userTappedPay,
+                            text: "Pay Now",
+                          ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

@@ -371,6 +371,15 @@ class Restaurant extends ChangeNotifier {
     notifyListeners();
   }
 
+  // update addons for a cart item
+  void updateCartItemAddons(CartItem cartItem, List<Addon> newAddons) {
+    int cartIndex = _cart.indexOf(cartItem);
+    if (cartIndex != -1) {
+      _cart[cartIndex].selectedAddons = newAddons;
+      notifyListeners();
+    }
+  }
+
   // get total price of cart
   double get totalPrice {
     double total = 0;
@@ -420,7 +429,7 @@ HELPERS
     for (final cartItem in _cart) {
       reciept.writeln(
           "${cartItem.quantity} x ${cartItem.food.name} - ${_formatPrice(cartItem.food.price)}");
-      if (cartItem.selectedAddons.isEmpty) {
+      if (cartItem.selectedAddons.isNotEmpty) {
         reciept.writeln(" Add-ons: ${_formatAddons(cartItem.selectedAddons)}");
       }
       reciept.writeln();
@@ -428,8 +437,12 @@ HELPERS
 
     reciept.writeln("---------");
     reciept.writeln();
+    reciept.writeln("Subtotal: ${_formatPrice(totalPrice)}");
+    reciept.writeln("Delivery Fee: ${_formatPrice(totalPrice * 0.1)}");
+    reciept.writeln("---------");
+    reciept.writeln("Total: ${_formatPrice(totalPrice * 1.1)}");
+    reciept.writeln();
     reciept.writeln("Total Items: ${getTotalItemCount()}");
-    reciept.writeln("price Items: ${_formatPrice(totalPrice)}");
 
     return reciept.toString();
   }

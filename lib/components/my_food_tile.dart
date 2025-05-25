@@ -29,7 +29,7 @@ class FoodTile extends StatelessWidget {
                     children: [
                       Text(food.name),
                       Text(
-                        '\N' + food.price.toString(),
+                        '\N${food.price}',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.primary,
                         ),
