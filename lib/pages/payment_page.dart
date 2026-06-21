@@ -84,12 +84,12 @@ class _PaymentPageState extends State<PaymentPage>
                 builder: (context, restaurant, child) => Column(
                   children: [
                     _buildDetailRow("Subtotal",
-                        "\N${restaurant.totalPrice.toStringAsFixed(2)}"),
+                        "N${restaurant.totalPrice.toStringAsFixed(2)}"),
                     _buildDetailRow("Delivery Fee",
-                        "\N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
+                        "N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
                     const Divider(height: 16),
                     Text(
-                      "Total Amount: \N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
+                      "Total Amount: N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
@@ -165,11 +165,11 @@ class _PaymentPageState extends State<PaymentPage>
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(
+        content: const Row(
           children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 8),
-            const Text('Payment successful!'),
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Payment successful!'),
           ],
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -199,7 +199,7 @@ class _PaymentPageState extends State<PaymentPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -223,7 +223,7 @@ class _PaymentPageState extends State<PaymentPage>
                       color: Theme.of(context)
                           .colorScheme
                           .secondary
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Column(
@@ -246,7 +246,7 @@ class _PaymentPageState extends State<PaymentPage>
                                 children: [
                                   const Text("Subtotal"),
                                   Text(
-                                      "\N${restaurant.totalPrice.toStringAsFixed(2)}"),
+                                      "N${restaurant.totalPrice.toStringAsFixed(2)}"),
                                 ],
                               ),
                               const SizedBox(height: 4),
@@ -256,7 +256,7 @@ class _PaymentPageState extends State<PaymentPage>
                                 children: [
                                   const Text("Delivery Fee"),
                                   Text(
-                                      "\N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
+                                      "N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
                                 ],
                               ),
                               const Divider(height: 16),
@@ -270,7 +270,7 @@ class _PaymentPageState extends State<PaymentPage>
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    "\N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
+                                    "N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color:

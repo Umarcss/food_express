@@ -134,7 +134,7 @@ class _DriverProfilePageState extends State<DriverProfilePage> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             ),
             child: Row(
               children: [
@@ -157,7 +157,7 @@ class _DriverProfilePageState extends State<DriverProfilePage> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.star,
                             color: Colors.amber,
                             size: 16,
@@ -188,7 +188,7 @@ class _DriverProfilePageState extends State<DriverProfilePage> {
               theme: DefaultChatTheme(
                 primaryColor: Theme.of(context).colorScheme.primary,
                 secondaryColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.background,
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 userAvatarNameColors: [Theme.of(context).colorScheme.primary],
               ),
             ),

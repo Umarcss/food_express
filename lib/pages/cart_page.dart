@@ -219,7 +219,7 @@ class _CartPageState extends State<CartPage>
                         color: Theme.of(context)
                             .colorScheme
                             .secondary
-                            .withOpacity(0.1),
+                            .withValues(alpha: 0.1),
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(20),
                         ),

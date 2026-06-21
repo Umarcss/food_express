@@ -26,9 +26,9 @@ class UserProfilePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               ),
-              child: Column(
+              child: const Column(
                 children: [
                   CircleAvatar(
                     radius: 50,
@@ -36,16 +36,16 @@ class UserProfilePage extends StatelessWidget {
                       'https://via.placeholder.com/150', // Replace with actual profile image
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16),
+                  Text(
                     'John Doe', // Replace with actual name
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8),
+                  Text(
                     'john.doe@example.com', // Replace with actual email
                     style: TextStyle(
                       fontSize: 16,

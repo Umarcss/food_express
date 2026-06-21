@@ -41,7 +41,7 @@ class MySilverAppBar extends StatelessWidget {
                   top: 0,
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.red,
                       shape: BoxShape.circle,
                     ),
@@ -109,7 +109,7 @@ class MySilverAppBar extends StatelessWidget {
           icon: const Icon(Icons.person_outline),
         ),
       ],
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       foregroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: const Text("Food Express"),
       flexibleSpace: FlexibleSpaceBar(

@@ -141,7 +141,7 @@ class _MyCartTileState extends State<MyCartTile> {
                           selectedColor: Theme.of(context)
                               .colorScheme
                               .primary
-                              .withOpacity(0.2),
+                              .withValues(alpha: 0.2),
                           checkmarkColor: Theme.of(context).colorScheme.primary,
                           labelStyle: TextStyle(
                             color: Theme.of(context).colorScheme.inversePrimary,

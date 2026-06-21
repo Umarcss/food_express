@@ -449,7 +449,7 @@ HELPERS
 
 // format double into money
   String _formatPrice(double price) {
-    return "\N${price.toStringAsFixed(2)}";
+    return "N${price.toStringAsFixed(2)}";
   }
 
 // format list of addons into a string summary

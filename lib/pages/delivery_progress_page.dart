@@ -287,7 +287,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.8),
+                                color: Colors.blue.withValues(alpha: 0.8),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
@@ -303,7 +303,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.8),
+                                color: Colors.red.withValues(alpha: 0.8),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
@@ -328,7 +328,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
                       color: Theme.of(context)
                           .colorScheme
                           .primary
-                          .withOpacity(0.1),
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -369,7 +369,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
                         ),
                       ),
                       const SizedBox(height: 16),
-                      MyReciept(),
+                      const MyReciept(),
                       if (_isContactlessDelivery || _isLeaveAtDoor)
                         Container(
                           margin: const EdgeInsets.only(top: 16),
@@ -378,7 +378,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
                             color: Theme.of(context)
                                 .colorScheme
                                 .primary
-                                .withOpacity(0.1),
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -431,11 +431,11 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
               color: isCompleted
                   ? Theme.of(context).colorScheme.primary
                   : isActive
-                      ? Theme.of(context).colorScheme.primary.withOpacity(0.5)
+                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
                       : Theme.of(context)
                           .colorScheme
                           .secondary
-                          .withOpacity(0.2),
+                          .withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -489,7 +489,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -546,7 +546,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
               ),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.star,
                     color: Colors.amber,
                     size: 16,
@@ -558,7 +558,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
                       color: Theme.of(context)
                           .colorScheme
                           .inversePrimary
-                          .withOpacity(0.7),
+                          .withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -571,7 +571,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
               // Message button
               Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.background,
+                  color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -597,7 +597,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
               // Call button
               Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.background,
+                  color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -681,11 +681,11 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage>
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Message Driver"),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: "Type your message...",
                 border: OutlineInputBorder(),
               ),

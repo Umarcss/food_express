@@ -99,7 +99,7 @@ class _FoodPageState extends State<FoodPage> with SingleTickerProviderStateMixin
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -270,7 +270,7 @@ class _FoodPageState extends State<FoodPage> with SingleTickerProviderStateMixin
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.8),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
@@ -280,7 +280,7 @@ class _FoodPageState extends State<FoodPage> with SingleTickerProviderStateMixin
                 ),
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.8),
                     shape: BoxShape.circle,
                   ),
                   child: IconButton(
