@@ -17,10 +17,12 @@ class OrderProvider extends ChangeNotifier {
   final OrderRepository _orderRepository;
   final PaymentService _paymentService;
   FoodOrder? _currentOrder;
+  final List<FoodOrder> _orderHistory = [];
   bool _isProcessing = false;
   String? _errorMessage;
 
   FoodOrder? get currentOrder => _currentOrder;
+  List<FoodOrder> get orderHistory => List.unmodifiable(_orderHistory);
   bool get isProcessing => _isProcessing;
   String? get errorMessage => _errorMessage;
 
@@ -52,7 +54,7 @@ class OrderProvider extends ChangeNotifier {
         _errorMessage = 'Payment could not be verified.';
         return false;
       }
-      _currentOrder = order;
+      _setCurrentOrder(order);
       return true;
     } catch (error) {
       _errorMessage = error.toString();
@@ -71,24 +73,52 @@ class OrderProvider extends ChangeNotifier {
     final subtotal =
         items.fold<int>(0, (sum, item) => sum + item.lineTotalKobo);
     final deliveryFee = subtotal == 0 ? 0 : (subtotal * 0.1).round();
-    _currentOrder = FoodOrder(
-      id: 'demo-order',
+    final now = DateTime.now();
+    final order = FoodOrder(
+      id: 'demo-${now.microsecondsSinceEpoch}',
       userId: userId,
       items: items.map((item) => item.toOrderMap()).toList(),
       subtotalKobo: subtotal,
       deliveryFeeKobo: deliveryFee,
       totalKobo: subtotal + deliveryFee,
-      status: OrderStatus.onTheWay,
+      status: OrderStatus.confirmed,
       paymentStatus: PaymentStatus.paid,
       deliveryAddress: deliveryAddress,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      createdAt: now,
+      updatedAt: now,
       driver: const {
         'name': 'Abba Umar',
         'phone': '+2349162836212',
         'rating': '4.8',
       },
     );
+    _setCurrentOrder(order);
+  }
+
+  void selectOrder(FoodOrder order) {
+    _currentOrder = order;
+    notifyListeners();
+  }
+
+  void updateCurrentOrderStatus(OrderStatus status) {
+    final order = _currentOrder;
+    if (order == null || order.status == status) return;
+    _setCurrentOrder(order.copyWith(status: status, updatedAt: DateTime.now()));
+  }
+
+  void _setCurrentOrder(FoodOrder order) {
+    _currentOrder = order;
+    final index = _orderHistory.indexWhere((item) => item.id == order.id);
+    if (index == -1) {
+      _orderHistory.insert(0, order);
+    } else {
+      _orderHistory[index] = order;
+      _orderHistory.sort((a, b) {
+        final aDate = a.updatedAt ?? a.createdAt ?? DateTime(0);
+        final bDate = b.updatedAt ?? b.createdAt ?? DateTime(0);
+        return bDate.compareTo(aDate);
+      });
+    }
     notifyListeners();
   }
 }

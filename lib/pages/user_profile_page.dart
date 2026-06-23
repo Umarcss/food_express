@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:food_express/design/app_theme.dart';
 import 'package:food_express/main.dart';
 import 'package:food_express/providers/auth_provider.dart';
+import 'package:food_express/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
 class UserProfilePage extends StatelessWidget {
@@ -10,6 +11,7 @@ class UserProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final orderCount = context.watch<OrderProvider>().orderHistory.length;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -60,8 +62,10 @@ class UserProfilePage extends StatelessWidget {
           _Tile(
             icon: Icons.history,
             title: 'Order history',
-            subtitle: 'Coming soon from Firestore orders',
-            onTap: () {},
+            subtitle: orderCount == 0
+                ? 'Track demo and paid order activity'
+                : '$orderCount session order${orderCount == 1 ? '' : 's'}',
+            onTap: () => Navigator.pushNamed(context, AppRoutes.orderHistory),
           ),
           _Tile(
             icon: Icons.location_on_outlined,

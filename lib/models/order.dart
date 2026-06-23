@@ -109,4 +109,34 @@ class FoodOrder {
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
     );
   }
+
+  FoodOrder copyWith({
+    OrderStatus? status,
+    PaymentStatus? paymentStatus,
+    String? paystackReference,
+    DateTime? updatedAt,
+  }) {
+    return FoodOrder(
+      id: id,
+      userId: userId,
+      items: items,
+      subtotalKobo: subtotalKobo,
+      deliveryFeeKobo: deliveryFeeKobo,
+      totalKobo: totalKobo,
+      status: status ?? this.status,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      deliveryAddress: deliveryAddress,
+      paystackReference: paystackReference ?? this.paystackReference,
+      driver: driver,
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  int get totalItemCount {
+    return items.fold<int>(
+      0,
+      (total, item) => total + ((item['quantity'] as num?)?.toInt() ?? 0),
+    );
+  }
 }

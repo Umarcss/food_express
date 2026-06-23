@@ -8,6 +8,7 @@ import 'package:food_express/pages/delivery_progress_page.dart';
 import 'package:food_express/pages/home_page.dart';
 import 'package:food_express/pages/login_page.dart';
 import 'package:food_express/pages/notifications_page.dart';
+import 'package:food_express/pages/order_history_page.dart';
 import 'package:food_express/pages/payment_page.dart';
 import 'package:food_express/pages/settings_page.dart';
 import 'package:food_express/pages/signup_page.dart';
@@ -104,6 +105,7 @@ class MyApp extends StatelessWidget {
         AppRoutes.checkout: (_) => const PaymentPage(),
         AppRoutes.delivery: (_) => const DeliveryProgressPage(),
         AppRoutes.profile: (_) => const UserProfilePage(),
+        AppRoutes.orderHistory: (_) => const OrderHistoryPage(),
         AppRoutes.notifications: (_) => const NotificationsPage(),
         AppRoutes.settings: (_) => const SettingsPage(),
       },
@@ -134,6 +136,7 @@ class AppRoutes {
   static const checkout = '/checkout';
   static const delivery = '/delivery';
   static const profile = '/profile';
+  static const orderHistory = '/order-history';
   static const notifications = '/notifications';
   static const settings = '/settings';
 }

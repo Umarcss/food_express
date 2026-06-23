@@ -5,6 +5,7 @@ import 'package:food_express/design/app_theme.dart';
 import 'package:food_express/main.dart';
 import 'package:food_express/providers/auth_provider.dart';
 import 'package:food_express/providers/cart_provider.dart';
+import 'package:food_express/providers/notification_provider.dart';
 import 'package:food_express/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -65,6 +66,14 @@ class _PaymentPageState extends State<PaymentPage> {
           items: cart.items,
           deliveryAddress: _addressController.text.trim(),
         );
+    final order = context.read<OrderProvider>().currentOrder;
+    context.read<NotificationProvider>().addDemoNotification(
+      title: 'Order confirmed',
+      body: order == null
+          ? 'Your demo order is moving to the kitchen.'
+          : 'Order ${_shortOrderId(order.id)} is confirmed and paid.',
+      data: {'orderId': order?.id},
+    );
     cart.clear();
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -192,6 +201,10 @@ class _PaymentPageState extends State<PaymentPage> {
       ),
     );
   }
+}
+
+String _shortOrderId(String id) {
+  return id.length <= 10 ? id : id.substring(0, 10);
 }
 
 BoxDecoration _cardDecoration() {

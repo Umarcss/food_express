@@ -84,6 +84,7 @@ flutter:
   assets:
     - lib/images/burgers/
     - lib/images/sides/
+    - lib/images/generated/
     - lib/assets/sounds/
     # - lib/images/salads/
     # - lib/images/drinks/

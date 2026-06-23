@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:food_express/components/glass_surface.dart';
 import 'package:food_express/components/my_reciept.dart';
 import 'package:food_express/design/app_theme.dart';
+import 'package:food_express/models/order.dart';
 import 'package:food_express/pages/driver_profile_page.dart';
+import 'package:food_express/providers/notification_provider.dart';
 import 'package:food_express/providers/order_provider.dart';
 import 'package:food_express/services/location_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -26,6 +28,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
   int _currentStep = 0;
   Timer? _timer;
   String? _locationError;
+  final Set<int> _announcedSteps = {};
 
   final List<String> _steps = const [
     'Order confirmed',
@@ -38,6 +41,9 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
   @override
   void initState() {
     super.initState();
+    final order = context.read<OrderProvider>().currentOrder;
+    _currentStep = _stepForStatus(order?.status);
+    _announcedSteps.addAll(List.generate(_currentStep + 1, (index) => index));
     _initializeMap();
     _simulateProgress();
   }
@@ -72,6 +78,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
   }
 
   void _simulateProgress() {
+    if (_currentStep >= _steps.length - 1) return;
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (!mounted) return;
       setState(() {
@@ -83,8 +90,49 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
           );
         }
       });
+      _syncOrderForStep(_currentStep);
       if (_currentStep == _steps.length - 1) timer.cancel();
     });
+  }
+
+  int _stepForStatus(OrderStatus? status) {
+    return switch (status) {
+      OrderStatus.pending || OrderStatus.confirmed => 0,
+      OrderStatus.preparing => 1,
+      OrderStatus.onTheWay => 3,
+      OrderStatus.delivered => 4,
+      OrderStatus.cancelled || null => 0,
+    };
+  }
+
+  void _syncOrderForStep(int step) {
+    if (_announcedSteps.contains(step)) return;
+    _announcedSteps.add(step);
+    final orders = context.read<OrderProvider>();
+    final notifications = context.read<NotificationProvider>();
+    final status = switch (step) {
+      0 => OrderStatus.confirmed,
+      1 => OrderStatus.preparing,
+      2 => OrderStatus.preparing,
+      3 => OrderStatus.onTheWay,
+      _ => OrderStatus.delivered,
+    };
+    orders.updateCurrentOrderStatus(status);
+    final orderId = orders.currentOrder?.id;
+    final body = switch (step) {
+      1 => 'The kitchen has started preparing your meal.',
+      2 => 'Abba Umar has been assigned to your delivery.',
+      3 => 'Your driver is on the way to your address.',
+      4 => 'Your demo order has been delivered. Enjoy your meal.',
+      _ => 'Your order is confirmed.',
+    };
+    if (step > 0) {
+      notifications.addDemoNotification(
+        title: _steps[step],
+        body: body,
+        data: {'orderId': orderId},
+      );
+    }
   }
 
   @override

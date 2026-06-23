@@ -55,7 +55,7 @@ class _SignupPageState extends State<SignupPage> {
         fit: StackFit.expand,
         children: [
           const AppImage(
-              path: 'lib/images/sides/pizza.jpeg', fit: BoxFit.cover),
+              path: 'lib/images/generated/loaded-fries.jpg', fit: BoxFit.cover),
           DecoratedBox(
             decoration: BoxDecoration(
               color: AppColors.espresso.withValues(alpha: 0.58),

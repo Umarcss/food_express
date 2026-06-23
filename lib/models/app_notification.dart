@@ -35,4 +35,18 @@ class AppNotification {
           : null,
     );
   }
+
+  AppNotification copyWith({
+    bool? isRead,
+  }) {
+    return AppNotification(
+      id: id,
+      title: title,
+      body: body,
+      type: type,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt,
+      data: data,
+    );
+  }
 }

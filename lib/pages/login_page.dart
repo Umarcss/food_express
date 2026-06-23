@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
         fit: StackFit.expand,
         children: [
           const AppImage(
-            path: 'lib/images/burgers/double.jpg',
+            path: 'lib/images/generated/classic-cheese-burger.jpg',
             fit: BoxFit.cover,
           ),
           DecoratedBox(

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:food_express/data/seed_menu.dart';
 import 'package:food_express/pages/login_page.dart';
+import 'package:food_express/models/order.dart';
 import 'package:food_express/providers/auth_provider.dart';
 import 'package:food_express/providers/cart_provider.dart';
 import 'package:food_express/providers/notification_provider.dart';
+import 'package:food_express/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -31,6 +33,48 @@ void main() {
 
     expect(cart.items, isEmpty);
     expect(cart.subtotalKobo, 0);
+  });
+
+  test('demo checkout creates session order history and updates status', () {
+    final orders = OrderProvider(firebaseEnabled: false);
+    final food = seedMenu.first;
+    final cart = CartProvider()..addFood(food, const [], quantity: 2);
+
+    orders.useDemoOrder(
+      userId: 'demo-user',
+      items: cart.items,
+      deliveryAddress: '25 Abuja Road',
+    );
+
+    expect(orders.currentOrder, isNotNull);
+    expect(orders.orderHistory, hasLength(1));
+    expect(orders.currentOrder!.status, OrderStatus.confirmed);
+    expect(orders.currentOrder!.totalItemCount, 2);
+
+    orders.updateCurrentOrderStatus(OrderStatus.delivered);
+
+    expect(orders.currentOrder!.status, OrderStatus.delivered);
+    expect(orders.orderHistory.first.status, OrderStatus.delivered);
+  });
+
+  test('local demo notifications can be read and cleared', () async {
+    final notifications = NotificationProvider(firebaseEnabled: false);
+
+    notifications.addDemoNotification(
+      title: 'Order confirmed',
+      body: 'Your order is confirmed.',
+    );
+
+    expect(notifications.notifications, hasLength(1));
+    expect(notifications.hasUnreadNotifications, isTrue);
+
+    await notifications.markAsRead(notifications.notifications.first.id);
+
+    expect(notifications.hasUnreadNotifications, isFalse);
+
+    await notifications.clearNotifications();
+
+    expect(notifications.notifications, isEmpty);
   });
 
   testWidgets('login screen renders modern auth form', (tester) async {

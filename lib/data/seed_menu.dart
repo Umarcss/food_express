@@ -6,7 +6,7 @@ const List<Food> seedMenu = [
     name: 'Classic Cheese Burger',
     description:
         'Juicy beef patty, cheddar, lettuce, tomato, pickles, and house sauce.',
-    imageUrl: 'lib/images/burgers/double.jpg',
+    imageUrl: 'lib/images/generated/classic-cheese-burger.jpg',
     priceKobo: 420000,
     category: FoodCategory.burgers,
     sortOrder: 1,
@@ -21,7 +21,7 @@ const List<Food> seedMenu = [
     name: 'Double Stack Burger',
     description:
         'Two smashed patties, caramelized onions, pickles, and smoky aioli.',
-    imageUrl: 'lib/images/burgers/double.jpg',
+    imageUrl: 'lib/images/generated/double-stack-burger.jpg',
     priceKobo: 620000,
     category: FoodCategory.burgers,
     sortOrder: 2,
@@ -35,7 +35,7 @@ const List<Food> seedMenu = [
     name: 'Garden Crunch Salad',
     description:
         'Crisp greens, cucumber, sweet corn, cherry tomatoes, and lemon dressing.',
-    imageUrl: 'lib/images/sides/pizza.jpeg',
+    imageUrl: 'lib/images/generated/garden-crunch-salad.jpg',
     priceKobo: 310000,
     category: FoodCategory.salads,
     sortOrder: 3,
@@ -49,7 +49,7 @@ const List<Food> seedMenu = [
     name: 'Loaded Fries',
     description:
         'Golden fries topped with cheese sauce, herbs, and spicy ketchup.',
-    imageUrl: 'lib/images/sides/pizza.jpeg',
+    imageUrl: 'lib/images/generated/loaded-fries.jpg',
     priceKobo: 260000,
     category: FoodCategory.sides,
     sortOrder: 4,
@@ -63,7 +63,7 @@ const List<Food> seedMenu = [
     name: 'Chocolate Parfait',
     description:
         'Layered chocolate cream, biscuit crumble, and a chilled caramel finish.',
-    imageUrl: 'lib/images/burgers/double.jpg',
+    imageUrl: 'lib/images/generated/chocolate-parfait.jpg',
     priceKobo: 280000,
     category: FoodCategory.desserts,
     sortOrder: 5,
@@ -75,7 +75,7 @@ const List<Food> seedMenu = [
     id: 'zobo-spritz',
     name: 'Zobo Spritz',
     description: 'Hibiscus, citrus, ginger, and sparkling water over ice.',
-    imageUrl: 'lib/images/sides/pizza.jpeg',
+    imageUrl: 'lib/images/generated/zobo-spritz.jpg',
     priceKobo: 180000,
     category: FoodCategory.drinks,
     sortOrder: 6,
