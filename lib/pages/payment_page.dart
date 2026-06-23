@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:food_express/components/my_button.dart';
-import 'package:food_express/models/restaurant.dart';
-import 'package:food_express/pages/delivery_progress_page.dart';
+import 'package:food_express/core/money.dart';
+import 'package:food_express/design/app_theme.dart';
+import 'package:food_express/main.dart';
+import 'package:food_express/providers/auth_provider.dart';
+import 'package:food_express/providers/cart_provider.dart';
+import 'package:food_express/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
 class PaymentPage extends StatefulWidget {
@@ -13,328 +15,282 @@ class PaymentPage extends StatefulWidget {
   State<PaymentPage> createState() => _PaymentPageState();
 }
 
-class _PaymentPageState extends State<PaymentPage>
-    with SingleTickerProviderStateMixin {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  String cardNumber = '';
-  String expiryDate = '';
-  String cardHolderName = '';
-  String cvvCode = '';
-  bool isCvvFocused = false;
-  bool _isProcessing = false;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+class _PaymentPageState extends State<PaymentPage> {
+  static const bool _livePaymentsEnabled = bool.fromEnvironment(
+    'ENABLE_LIVE_PAYMENTS',
+    defaultValue: false,
+  );
+
+  final _addressController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeIn,
-      ),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOut,
-      ),
-    );
-
-    _animationController.forward();
+    final auth = context.read<AuthProvider>();
+    _addressController.text = auth.defaultAddress;
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
-  void _showPaymentConfirmation() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Confirm Payment"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Please confirm your payment details:",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow("Card Number",
-                  "•••• ${cardNumber.substring(cardNumber.length - 4)}"),
-              _buildDetailRow("Expiry Date", expiryDate),
-              _buildDetailRow("Card Holder", cardHolderName),
-              const SizedBox(height: 16),
-              Consumer<Restaurant>(
-                builder: (context, restaurant, child) => Column(
-                  children: [
-                    _buildDetailRow("Subtotal",
-                        "N${restaurant.totalPrice.toStringAsFixed(2)}"),
-                    _buildDetailRow("Delivery Fee",
-                        "N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
-                    const Divider(height: 16),
-                    Text(
-                      "Total Amount: N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              "Cancel",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _processPayment();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text("Confirm"),
-          ),
-        ],
-      ),
+  Future<void> _pay() async {
+    final auth = context.read<AuthProvider>();
+    final cart = context.read<CartProvider>();
+    final orders = context.read<OrderProvider>();
+    if (auth.user == null) return;
+    final success = await orders.checkout(
+      userId: auth.user!.uid,
+      items: cart.items,
+      deliveryAddress: _addressController.text.trim(),
     );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _processPayment() async {
-    setState(() => _isProcessing = true);
-
-    // Simulate payment processing
-    await Future.delayed(const Duration(seconds: 2));
-
     if (!mounted) return;
-
-    setState(() => _isProcessing = false);
-
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white),
-            SizedBox(width: 8),
-            Text('Payment successful!'),
-          ],
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-
-    // Navigate to delivery progress
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DeliveryProgressPage(),
-      ),
-    );
+    if (success) {
+      cart.clear();
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.delivery,
+        ModalRoute.withName(AppRoutes.home),
+      );
+    }
   }
 
-  void userTappedPay() {
-    if (formKey.currentState!.validate()) {
-      _showPaymentConfirmation();
-    }
+  void _continueWithDemo() {
+    final auth = context.read<AuthProvider>();
+    final cart = context.read<CartProvider>();
+    context.read<OrderProvider>().useDemoOrder(
+          userId: auth.user?.uid ?? 'demo-user',
+          items: cart.items,
+          deliveryAddress: _addressController.text.trim(),
+        );
+    cart.clear();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.delivery,
+      ModalRoute.withName(AppRoutes.home),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+    final orders = context.watch<OrderProvider>();
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Checkout"),
-        elevation: 0,
-      ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Column(
+      appBar: AppBar(title: const Text('Checkout')),
+      body: ListView(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: _cardDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _CheckoutStep(number: '1', label: 'Delivery'),
+                const SizedBox(height: AppSpacing.lg),
+                Text('Delivery address',
+                    style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: AppSpacing.md),
+                TextField(
+                  controller: _addressController,
+                  minLines: 2,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.location_on_outlined),
+                    hintText: 'Enter delivery address',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: _cardDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _CheckoutStep(number: '2', label: 'Summary'),
+                const SizedBox(height: AppSpacing.lg),
+                Text('Order summary',
+                    style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: AppSpacing.md),
+                _Row(label: 'Subtotal', value: formatKobo(cart.subtotalKobo)),
+                _Row(
+                    label: 'Delivery', value: formatKobo(cart.deliveryFeeKobo)),
+                const Divider(height: 28),
+                _Row(
+                  label: 'Total',
+                  value: formatKobo(cart.totalKobo),
+                  isTotal: true,
+                ),
+              ],
+            ),
+          ),
+          if (orders.errorMessage != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.danger.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(AppRadii.md),
+              ),
+              child: Text(
+                orders.errorMessage!,
+                style: const TextStyle(color: AppColors.danger),
+              ),
+            ),
+          ],
+          const SizedBox(height: AppSpacing.lg),
+          if (!_livePaymentsEnabled) ...[
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.gold.withValues(alpha: 0.22),
+                borderRadius: BorderRadius.circular(AppRadii.md),
+                border: Border.all(color: AppColors.gold),
+              ),
+              child: const Row(
                 children: [
-                  // Order summary
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(15),
+                  Icon(Icons.info_outline_rounded),
+                  SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      'Paystack is paused on the free plan. Demo delivery is ready.',
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Order Summary",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Consumer<Restaurant>(
-                          builder: (context, restaurant, child) => Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text("Subtotal"),
-                                  Text(
-                                      "N${restaurant.totalPrice.toStringAsFixed(2)}"),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text("Delivery Fee"),
-                                  Text(
-                                      "N${(restaurant.totalPrice * 0.1).toStringAsFixed(2)}"),
-                                ],
-                              ),
-                              const Divider(height: 16),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text(
-                                    "Total",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "N${(restaurant.totalPrice * 1.1).toStringAsFixed(2)}",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Credit card widget
-                  CreditCardWidget(
-                    cardNumber: cardNumber,
-                    expiryDate: expiryDate,
-                    cardHolderName: cardHolderName,
-                    cvvCode: cvvCode,
-                    showBackView: isCvvFocused,
-                    onCreditCardWidgetChange: (p0) {},
-                    cardBgColor: Theme.of(context).colorScheme.primary,
-                    textStyle: const TextStyle(color: Colors.white),
-                    cardType: CardType.visa,
-                  ),
-
-                  // Credit card form
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: CreditCardForm(
-                      cardNumber: cardNumber,
-                      expiryDate: expiryDate,
-                      cardHolderName: cardHolderName,
-                      cvvCode: cvvCode,
-                      onCreditCardModelChange: (data) {
-                        setState(() {
-                          cardNumber = data.cardNumber;
-                          expiryDate = data.expiryDate;
-                          cardHolderName = data.cardHolderName;
-                          cvvCode = data.cvvCode;
-                          isCvvFocused = data.isCvvFocused;
-                        });
-                      },
-                      formKey: formKey,
-                    ),
-                  ),
-
-                  // Pay button
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _isProcessing
-                        ? const CircularProgressIndicator()
-                        : MyButton(
-                            onTap: userTappedPay,
-                            text: "Pay Now",
-                          ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(height: AppSpacing.md),
+          ],
+          PrimaryButton(
+            text: _livePaymentsEnabled
+                ? 'Pay securely with Paystack'
+                : 'Paystack unavailable',
+            icon: Icons.lock_outline,
+            isLoading: orders.isProcessing,
+            onPressed: cart.isEmpty || !_livePaymentsEnabled ? null : _pay,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          FilledButton.icon(
+            onPressed: cart.isEmpty ? null : _continueWithDemo,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.success,
+              foregroundColor: Colors.white,
+              minimumSize: const Size.fromHeight(56),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadii.pill),
+              ),
+            ),
+            icon: const Icon(Icons.delivery_dining_rounded),
+            label: const Text('Continue with demo delivery'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+BoxDecoration _cardDecoration() {
+  return BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(AppRadii.lg),
+    border: Border.all(color: AppColors.line),
+    boxShadow: AppShadows.tight(AppColors.charcoal),
+  );
+}
+
+class _CheckoutStep extends StatelessWidget {
+  final String number;
+  final String label;
+
+  const _CheckoutStep({
+    required this.number,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 16,
+          backgroundColor: AppColors.gold,
+          child: Text(
+            number,
+            style: const TextStyle(
+              color: AppColors.charcoal,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ),
+        const SizedBox(width: AppSpacing.sm),
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.w900),
+        ),
+      ],
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isTotal;
+
+  const _Row({
+    required this.label,
+    required this.value,
+    this.isTotal = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final valueStyle = TextStyle(
+            color: isTotal ? AppColors.tomato : AppColors.charcoal,
+            fontWeight: FontWeight.w900,
+            fontSize: isTotal ? 20 : 15,
+          );
+          if (constraints.maxWidth < 180) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(value, style: valueStyle),
+                ),
+              ],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(
+                child: Text(label, overflow: TextOverflow.ellipsis),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(value, style: valueStyle),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

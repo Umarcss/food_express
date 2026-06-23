@@ -1,4 +1,3 @@
-
 class UserProfile {
   final String id;
   final String name;
@@ -50,4 +49,4 @@ class UserProfile {
       paymentMethod: paymentMethod ?? this.paymentMethod,
     );
   }
-} 
+}

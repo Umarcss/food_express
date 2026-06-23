@@ -1,65 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:food_express/models/food.dart';
+import 'package:food_express/design/app_theme.dart';
 
-class QuantitySelectos extends StatelessWidget {
+class QuantitySelector extends StatelessWidget {
   final int quantity;
-  final Food food;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
 
-  const QuantitySelectos(
-      {super.key,
-      required this.quantity,
-      required this.food,
-      required this.onDecrement,
-      required this.onIncrement});
+  const QuantitySelector({
+    super.key,
+    required this.quantity,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(50),
+        color: Colors.white.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(AppRadii.pill),
       ),
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // decrement button
-          GestureDetector(
-            onTap: onDecrement,
-            child: Icon(
-              Icons.remove,
-              size: 20,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+          IconButton(
+            onPressed: onDecrement,
+            icon: const Icon(Icons.remove),
           ),
-
-          // quantity count
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: SizedBox(
-              width: 20,
-              child: Center(
-                child: Text(
-                  quantity.toString(),
-                ),
+          SizedBox(
+            width: 28,
+            child: Center(
+              child: Text(
+                quantity.toString(),
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),
           ),
-
-          // increment button
-
-           GestureDetector(
-            onTap: onIncrement,
-            child: Icon(
-              Icons.add,
-              size: 20,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+          IconButton(
+            onPressed: onIncrement,
+            icon: const Icon(Icons.add),
           ),
         ],
       ),
     );
   }
+}
+
+class QuantitySelectos extends QuantitySelector {
+  const QuantitySelectos({
+    super.key,
+    required super.quantity,
+    required super.onDecrement,
+    required super.onIncrement,
+    required Object food,
+  });
 }

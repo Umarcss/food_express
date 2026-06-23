@@ -16,9 +16,9 @@ class _MyDrawerState extends State<MyDrawer> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       child: Column(
         children: [
-          // logo 
+          // logo
           Padding(
-            padding: const EdgeInsets.only( top: 100.0),
+            padding: const EdgeInsets.only(top: 100.0),
             child: Icon(
               Icons.lock_open_rounded,
               size: 80,
@@ -35,33 +35,36 @@ class _MyDrawerState extends State<MyDrawer> {
           // home list tile
 
           MyDrawerTile(
-            text: "H O M E", 
+            text: "H O M E",
             icon: Icons.home,
             onTap: () => Navigator.pop(context),
-            ),
+          ),
 
           // settings list tile
-          
-           MyDrawerTile(
-            text: "S E T T I N G S", 
+
+          MyDrawerTile(
+            text: "S E T T I N G S",
             icon: Icons.settings,
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage(),
-              ));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsPage(),
+                  ));
             },
-            ),
+          ),
 
           const Spacer(),
-          // logout list tile 
+          // logout list tile
 
-           MyDrawerTile(
-            text: "L O G O U T", 
+          MyDrawerTile(
+            text: "L O G O U T",
             icon: Icons.logout,
             onTap: () {},
-            ),
+          ),
 
-            const SizedBox(height: 25),
+          const SizedBox(height: 25),
         ],
       ),
     );

@@ -1,461 +1,81 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:food_express/core/money.dart';
+import 'package:food_express/data/seed_menu.dart';
 import 'package:food_express/models/cart_item.dart';
 import 'package:food_express/models/food.dart';
-import 'package:intl/intl.dart';
 
+@Deprecated('Use MenuProvider and CartProvider instead.')
 class Restaurant extends ChangeNotifier {
-  // list of food menu
-  final List<Food> _Menu = [
-    // burgers
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.burgers,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.burgers,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.burgers,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.burgers,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.burgers,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    // salads
-    Food(
-        name: "classic chesse salad",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.salads,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse salad",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.salads,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse salad",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.salads,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse salad",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.salads,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse salad",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.salads,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-
-    //sides
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.sides,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.sides,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.sides,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.sides,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.sides,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-
-    // desserts
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.desserts,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.desserts,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.desserts,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.desserts,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.desserts,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-
-    // drinks
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.drinks,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.drinks,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.drinks,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.drinks,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-    Food(
-        name: "classic chesse burger",
-        describtion:
-            "A juice beef patty with melted chedder, lettuce , tomato, and hint onions and pickle .",
-        imagePath: "lib/images/burgers/double.jpg",
-        price: 0.99,
-        category: FoodCategory.drinks,
-        availableAddons: [
-          Addon(name: "Extra cheese", price: 300),
-          Addon(name: "Becon", price: 500),
-          Addon(name: "Avacado", price: 800)
-        ]),
-  ];
-/*
-  GETTERS 
-*/
-
-  List<Food> get menu => _Menu;
-  List<CartItem> get cart => _cart;
-/*  
-  OPERATIONS 
-
-*/
-
-// user cart
   final List<CartItem> _cart = [];
 
-  // add to cart
+  List<Food> get menu => seedMenu;
+  List<CartItem> get cart => List.unmodifiable(_cart);
+
   void addToCart(Food food, List<Addon> selectedAddons, [int quantity = 1]) {
-    // see if the item is already in cart
-    CartItem? cartItem = _cart.firstWhereOrNull((item) {
-      // check if the food items are the same
-      bool isSameFood = item.food == food;
-
-      // check if the list of selected addons are the same
-      bool isSameAddons =
-          const ListEquality().equals(item.selectedAddons, selectedAddons);
-
-      return isSameFood && isSameAddons;
-    });
-
-    if (cartItem != null) {
-      // if the item is already in cart, increase the quantity
-      cartItem.quantity += quantity;
+    final item = CartItem.fromFood(
+      food,
+      selectedAddons,
+      quantity: quantity,
+    );
+    final index = _cart.indexWhere((entry) => entry.id == item.id);
+    if (index == -1) {
+      _cart.add(item);
     } else {
-      // if the item is not in cart, add it
-      _cart.add(CartItem(
-          food: food, selectedAddons: selectedAddons, quantity: quantity));
+      _cart[index].quantity += quantity;
     }
-
     notifyListeners();
   }
 
-  // remove to cart
   void removeFromCart(CartItem cartItem) {
-    int cartIndex = _cart.indexOf(cartItem);
-
-    if (cartIndex != -1) {
-      if (_cart[cartIndex].quantity > 1) {
-        _cart[cartIndex].quantity--;
-      } else {
-        _cart.removeAt(cartIndex);
-      }
+    final index = _cart.indexWhere((entry) => entry.id == cartItem.id);
+    if (index == -1) return;
+    if (_cart[index].quantity <= 1) {
+      _cart.removeAt(index);
+    } else {
+      _cart[index].quantity--;
     }
-
     notifyListeners();
   }
 
-  // update addons for a cart item
   void updateCartItemAddons(CartItem cartItem, List<Addon> newAddons) {
-    int cartIndex = _cart.indexOf(cartItem);
-    if (cartIndex != -1) {
-      _cart[cartIndex].selectedAddons = newAddons;
-      notifyListeners();
-    }
+    final index = _cart.indexWhere((entry) => entry.id == cartItem.id);
+    if (index == -1) return;
+    _cart[index] = _cart[index].copyWith(selectedAddons: newAddons);
+    notifyListeners();
   }
 
-  // get total price of cart
-  double get totalPrice {
-    double total = 0;
-    for (CartItem item in _cart) {
-      total += item.totalPrice;
-    }
-    return total;
-  }
-
-  // get total numbers of item in the cart
+  int get totalPriceKobo =>
+      _cart.fold<int>(0, (sum, item) => sum + item.lineTotalKobo);
+  double get totalPrice => totalPriceKobo / 100;
 
   int getTotalItemCount() {
-    int totalItemCount = 0;
-
-    for (CartItem cartItem in _cart) {
-      totalItemCount += cartItem.quantity;
-    }
-
-    return totalItemCount;
+    return _cart.fold<int>(0, (sum, item) => sum + item.quantity);
   }
 
-  // clear the cart
   void clearCart() {
     _cart.clear();
     notifyListeners();
   }
 
-/*
-HELPERS
-
-*/
-
-// generate reciept
   String displayCartReciept() {
-    final reciept = StringBuffer();
-    reciept.writeln("Here's your reciept.");
-    reciept.writeln();
-
-    // format the date to include  up  to  seconds only
-    String formattedDate =
-        DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now());
-
-    reciept.writeln(formattedDate);
-    reciept.writeln();
-    reciept.writeln("---------");
-
-    for (final cartItem in _cart) {
-      reciept.writeln(
-          "${cartItem.quantity} x ${cartItem.food.name} - ${_formatPrice(cartItem.food.price)}");
-      if (cartItem.selectedAddons.isNotEmpty) {
-        reciept.writeln(" Add-ons: ${_formatAddons(cartItem.selectedAddons)}");
-      }
-      reciept.writeln();
+    final receipt = StringBuffer()
+      ..writeln("Here's your receipt.")
+      ..writeln()
+      ..writeln(DateTime.now())
+      ..writeln('---------');
+    for (final item in _cart) {
+      receipt.writeln(
+        '${item.quantity} x ${item.foodName} - ${formatKobo(item.lineTotalKobo)}',
+      );
     }
-
-    reciept.writeln("---------");
-    reciept.writeln();
-    reciept.writeln("Subtotal: ${_formatPrice(totalPrice)}");
-    reciept.writeln("Delivery Fee: ${_formatPrice(totalPrice * 0.1)}");
-    reciept.writeln("---------");
-    reciept.writeln("Total: ${_formatPrice(totalPrice * 1.1)}");
-    reciept.writeln();
-    reciept.writeln("Total Items: ${getTotalItemCount()}");
-
-    return reciept.toString();
-  }
-
-// format double into money
-  String _formatPrice(double price) {
-    return "N${price.toStringAsFixed(2)}";
-  }
-
-// format list of addons into a string summary
-  String _formatAddons(List<Addon> addons) {
-    return addons
-        .map((addon) => "${addon.name} (${_formatPrice(addon.price)})")
-        .join(", ");
+    receipt
+      ..writeln('---------')
+      ..writeln('Subtotal: ${formatKobo(totalPriceKobo)}')
+      ..writeln(
+          'Delivery Fee: ${formatKobo(deliveryFeeForSubtotal(totalPriceKobo))}')
+      ..writeln(
+          'Total: ${formatKobo(totalPriceKobo + deliveryFeeForSubtotal(totalPriceKobo))}')
+      ..writeln('Total Items: ${getTotalItemCount()}');
+    return receipt.toString();
   }
 }

@@ -1,24 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:food_express/themes/dark_mode.dart';
-import 'package:food_express/themes/light_mode.dart';
+import 'package:food_express/design/app_theme.dart';
 
 class ThemeProvider with ChangeNotifier {
-  ThemeData _themeData = lightMode;
+  ThemeMode _themeMode = ThemeMode.light;
 
-  ThemeData get themeData => _themeData;
+  ThemeMode get themeMode => _themeMode;
+  ThemeData get themeData =>
+      _themeMode == ThemeMode.dark ? AppTheme.dark() : AppTheme.light();
+  bool get isDarkMode => _themeMode == ThemeMode.dark;
 
-  bool get isDarkMode => _themeData == darktMode;
-
-  set themeData(ThemeData themeData) {
-   _themeData = themeData;
-   notifyListeners(); 
-  }
-
-  void  toggleTheme() {
-    if (_themeData == lightMode) {
-      themeData = darktMode;
-    } else {
-      themeData = lightMode;
-    }
+  void toggleTheme() {
+    _themeMode = isDarkMode ? ThemeMode.light : ThemeMode.dark;
+    notifyListeners();
   }
 }

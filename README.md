@@ -1,250 +1,131 @@
-# Food Express 🍔
+# Food Express
 
-A modern food delivery application built with Flutter, offering a seamless experience for ordering food online.
+Food Express is a Flutter food delivery app with a production-shaped foundation:
+Firebase authentication/data services, Paystack checkout boundaries, a modern
+warm glassmorphic UI, cart/order state, notifications, and map-based delivery
+tracking with simulated driver movement.
 
-## Features 🌟
+## Current Status
 
-### Core Features
-- **User Authentication**
-  - Secure login and registration system
-  - Password recovery functionality
-  - Session management
-  - User profile management
+Implemented:
 
-- **Food Categories & Menu**
-  - Browse through various food categories including:
-    - Burgers
-    - Sides
-    - (More categories coming soon)
-  - Detailed food item descriptions
-  - High-quality food images
-  - Price and nutritional information
+- Modern warm premium UI with glass surfaces, soft shadows, food cards, auth,
+  home, detail, cart, checkout, delivery, profile, settings, and notifications.
+- Provider-based architecture split into auth, menu, cart, orders, and
+  notifications.
+- Firestore-backed repositories with local seed menu fallback in debug builds.
+- Firebase Auth profile creation and session gate.
+- Paystack client flow wired through callable Cloud Functions.
+- Google Maps delivery screen with real user location request and simulated
+  driver marker.
+- Android/iOS permissions for location, notifications, phone links, and maps.
+- Analyzer-clean Dart code and basic tests.
 
-- **Shopping Experience**
-  - Interactive shopping cart
-  - Real-time price calculation
-  - Item quantity management
-  - Save favorite items
-  - Order history tracking
+Still requires project setup:
 
-- **Payment System**
-  - Secure credit card processing
-  - Multiple payment methods support
-  - Order confirmation
-  - Digital receipts
-  - Transaction history
+- A valid Firebase project for Android/iOS.
+- Deployed Cloud Functions.
+- Paystack secret key stored only as a Firebase Functions secret before
+  production deploy.
+- Google Maps API key in Android local properties and iOS app configuration.
 
-- **Delivery Tracking**
-  - Real-time order status updates
-  - Delivery progress tracking
-  - Estimated delivery time
-  - Delivery confirmation
+## Architecture
 
-- **User Settings**
-  - Profile customization
-  - Notification preferences
-  - Language selection
-  - Theme customization (Light/Dark mode)
+Core app state lives in `lib/providers`:
 
-### Technical Features
-- **Responsive Design**
-  - Cross-platform support:
-    - iOS
-    - Android
-    - Web
-    - Windows
-    - macOS
-    - Linux
-  - Adaptive layouts for different screen sizes
-  - Touch-friendly interface
+- `AuthProvider`: Firebase session, login, signup, logout, profile data.
+- `MenuProvider`: menu stream from Firestore with debug seed fallback.
+- `CartProvider`: cart items, quantities, add-ons, totals in kobo.
+- `OrderProvider`: order creation, payment orchestration, demo order fallback.
+- `NotificationProvider`: read-only notification state and provider-owned
+  mutation methods.
 
-- **Performance**
-  - Fast loading times
-  - Smooth animations
-  - Efficient state management
-  - Optimized image loading
+Main data and service boundaries:
 
-## Tech Stack 🛠
+- `MenuRepository.watchMenu()`
+- `OrderRepository.createOrder()`
+- `NotificationRepository.watchUserNotifications()`
+- `AuthService.signIn()` / `AuthService.signUp()`
+- `PaymentService.initialize()` / `launch()` / `verify()`
 
-### Frontend
-- **Framework**: Flutter
-- **State Management**: Provider
-- **UI Components**: Material Design & Cupertino
-- **Payment Processing**: Flutter Credit Card
-- **Date/Time Handling**: Intl
-- **Collections**: Collection package
+Money is stored as integer kobo and displayed as Nigerian naira.
 
-### Backend Integration
-- **Authentication API**
-  - User registration
-  - Login/logout
-  - Password reset
-  - Session management
+## Firebase Collections
 
-- **Food Menu API**
-  - Category listing
-  - Item details
-  - Price updates
-  - Availability status
+- `users/{uid}`: `displayName`, `email`, `phone`, `photoUrl`,
+  `defaultAddress`, `createdAt`, `updatedAt`
+- `menuItems/{id}`: `name`, `description`, `category`, `imageUrl`,
+  `priceKobo`, `addons`, `isAvailable`, `sortOrder`
+- `orders/{id}`: `userId`, `items`, `subtotalKobo`, `deliveryFeeKobo`,
+  `totalKobo`, `status`, `paymentStatus`, `paystackReference`,
+  `deliveryAddress`, `driver`, `createdAt`, `updatedAt`
+- `notifications/{id}`: `userId`, `title`, `body`, `type`, `isRead`,
+  `createdAt`, `data`
 
-- **Order Management API**
-  - Order creation
-  - Status updates
-  - History tracking
-  - Delivery tracking
+## Local Setup
 
-- **Payment Gateway API**
-  - Secure transactions
-  - Payment verification
-  - Refund processing
-  - Transaction history
+Install Flutter dependencies:
 
-## Project Structure 📁
-
-```
-lib/
-├── auth/         # Authentication related code
-│   ├── login_page.dart
-│   └── signup_page.dart
-├── components/   # Reusable UI components
-│   ├── food_card.dart
-│   └── custom_button.dart
-├── images/       # Image assets
-│   ├── burgers/  # Burger images
-│   └── sides/    # Side dish images
-├── models/       # Data models
-│   ├── user.dart
-│   └── food_item.dart
-├── pages/        # Screen pages
-│   ├── home_page.dart
-│   ├── cart_page.dart
-│   ├── payment_page.dart
-│   └── delivery_progress_page.dart
-└── themes/       # App theming
-    ├── colors.dart
-    └── text_styles.dart
+```bash
+flutter pub get
 ```
 
-## Getting Started 🚀
+Run checks:
 
-### Prerequisites
-1. **Development Environment**
-   - Flutter SDK (>=3.3.4)
-   - Dart SDK
-   - Android Studio / VS Code with Flutter extensions
-   - Git
+```bash
+flutter analyze
+flutter test
+```
 
-2. **System Requirements**
-   - Windows 10/11, macOS, or Linux
-   - Minimum 8GB RAM
-   - 10GB free disk space
-   - Stable internet connection
+Run the app:
 
-3. **Required Accounts**
-   - Google account for Android development
-   - Apple Developer account for iOS development
-   - Payment gateway account (for payment integration)
+```bash
+flutter run
+```
 
-### Installation
+The Paystack test public key is configured in the app. Override it when needed
+with `--dart-define=PAYSTACK_PUBLIC_KEY=pk_test_your_key`.
 
-1. **Clone the Repository**
-   ```bash
-   git clone [repository-url]
-   cd food_express
-   ```
+For Android maps, add this to `android/local.properties`:
 
-2. **Install Dependencies**
-   ```bash
-   flutter pub get
-   ```
+```properties
+MAPS_API_KEY=your_google_maps_key
+```
 
-3. **Configure Environment**
-   - Create a `.env` file in the root directory
-   - Add necessary API keys and configuration:
-     ```
-     API_BASE_URL=your_api_base_url
-     PAYMENT_GATEWAY_KEY=your_payment_gateway_key
-     ```
+## Cloud Functions
 
-4. **Platform-Specific Setup**
+Install dependencies in the functions folder:
 
-   **Android**
-   ```bash
-   # Generate Android keystore
-   keytool -genkey -v -keystore android/app/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-   
-   # Update android/app/build.gradle with keystore information
-   ```
+```bash
+cd functions
+npm install
+```
 
-   **iOS**
-   ```bash
-   # Install CocoaPods
-   sudo gem install cocoapods
-   
-   # Install iOS dependencies
-   cd ios
-   pod install
-   cd ..
-   ```
+Set the Paystack secret key:
 
-5. **Run the App**
-   ```bash
-   # For development
-   flutter run
-   
-   # For production build
-   flutter build apk --release  # Android
-   flutter build ios --release  # iOS
-   ```
+```bash
+firebase functions:secrets:set PAYSTACK_SECRET_KEY
+```
 
-### Development Guidelines
+Deploy:
 
-1. **Code Style**
-   - Follow Flutter's official style guide
-   - Use meaningful variable and function names
-   - Add comments for complex logic
-   - Keep functions small and focused
+```bash
+firebase deploy --only functions
+```
 
-2. **State Management**
-   - Use Provider for state management
-   - Keep state as local as possible
-   - Use ChangeNotifier for complex state
+The Flutter app calls:
 
-3. **Testing**
-   ```bash
-   # Run unit tests
-   flutter test
-   
-   # Run integration tests
-   flutter test integration_test
-   ```
+- `initializePaystackPayment(orderId)`
+- `verifyPaystackPayment(reference)`
 
-4. **API Integration**
-   - Use proper error handling
-   - Implement retry mechanisms
-   - Cache responses when appropriate
-   - Handle offline scenarios
+## Notes
 
-## Contributing 🤝
+- The delivery map is real, but driver movement is currently simulated.
+- Debug builds use a local seed menu if Firestore is empty or unavailable.
+- The checkout screen has a demo delivery fallback so UI development can
+  continue before Firebase Functions and Paystack are deployed.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
-### Pull Request Guidelines
-- Follow the existing code style
-- Add tests for new features
-- Update documentation
-- Provide clear commit messages
+<!-- Email: test@example.com
+Password: password123 -->
 
-## License 📝
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments 🙏
-
-- Flutter team for the amazing framework
-- All contributors who have helped shape this project
-- Open source community for various packages and tools

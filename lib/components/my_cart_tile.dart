@@ -1,165 +1,112 @@
 import 'package:flutter/material.dart';
-import 'package:food_express/components/my_quantity_selector.dart';
+import 'package:food_express/components/app_image.dart';
+import 'package:food_express/components/price_text.dart';
+import 'package:food_express/design/app_theme.dart';
 import 'package:food_express/models/cart_item.dart';
-import 'package:food_express/models/restaurant.dart';
-import 'package:food_express/models/food.dart';
+import 'package:food_express/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 
-class MyCartTile extends StatefulWidget {
+class MyCartTile extends StatelessWidget {
   final CartItem cartItem;
 
   const MyCartTile({super.key, required this.cartItem});
 
   @override
-  State<MyCartTile> createState() => _MyCartTileState();
-}
-
-class _MyCartTileState extends State<MyCartTile> {
-  late Map<Addon, bool> selectedAddons;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedAddons = {};
-    // Initialize selected addons map
-    for (Addon addon in widget.cartItem.food.availableAddons) {
-      selectedAddons[addon] = widget.cartItem.selectedAddons.contains(addon);
-    }
-  }
-
-  void _updateAddons() {
-    List<Addon> newSelectedAddons = selectedAddons.entries
-        .where((entry) => entry.value)
-        .map((entry) => entry.key)
-        .toList();
-
-    context
-        .read<Restaurant>()
-        .updateCartItemAddons(widget.cartItem, newSelectedAddons);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Consumer<Restaurant>(
-      builder: (context, restaurant, child) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-        child: Column(
+    final cart = context.read<CartProvider>();
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(color: AppColors.line),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
+            AppImage(
+              path: cartItem.imageUrl,
+              width: 92,
+              height: 92,
+              borderRadius: BorderRadius.circular(AppRadii.md),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // food image
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      widget.cartItem.food.imagePath,
-                      height: 100,
-                      width: 100,
-                    ),
+                  Text(
+                    cartItem.foodName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
-
-                  const SizedBox(width: 10),
-
-                  // name and price
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // food name
-                      Text(widget.cartItem.food.name),
-
-                      // food price
-                      Text(
-                        'N${widget.cartItem.food.price.toString()}',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary),
-                      ),
-                    ],
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    cartItem.selectedAddons.isEmpty
+                        ? 'No extras'
+                        : cartItem.selectedAddons
+                            .map((addon) => addon.name)
+                            .join(', '),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
-
-                  const Spacer(),
-
-                  // increment or decrement quantity
-                  QuantitySelectos(
-                    quantity: widget.cartItem.quantity,
-                    food: widget.cartItem.food,
-                    onDecrement: () {
-                      restaurant.removeFromCart(widget.cartItem);
-                    },
-                    onIncrement: () {
-                      restaurant.addToCart(
-                          widget.cartItem.food, widget.cartItem.selectedAddons);
-                    },
-                  )
+                  const SizedBox(height: AppSpacing.sm),
+                  PriceText(amountKobo: cartItem.lineTotalKobo),
                 ],
               ),
             ),
-
-            // addons
-            if (widget.cartItem.food.availableAddons.isNotEmpty)
-              Container(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Add-ons",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children:
-                          widget.cartItem.food.availableAddons.map((addon) {
-                        return FilterChip(
-                          label: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(addon.name),
-                              Text(' (N${addon.price})'),
-                            ],
-                          ),
-                          selected: selectedAddons[addon] ?? false,
-                          onSelected: (bool selected) {
-                            setState(() {
-                              selectedAddons[addon] = selected;
-                            });
-                            _updateAddons();
-                          },
-                          backgroundColor:
-                              Theme.of(context).colorScheme.secondary,
-                          selectedColor: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withValues(alpha: 0.2),
-                          checkmarkColor: Theme.of(context).colorScheme.primary,
-                          labelStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                            fontSize: 12,
-                          ),
-                          shape: StadiumBorder(
-                            side: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
+            const SizedBox(width: AppSpacing.sm),
+            _CartStepper(
+              quantity: cartItem.quantity,
+              onDecrement: () => cart.decrement(cartItem),
+              onIncrement: () => cart.increment(cartItem),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CartStepper extends StatelessWidget {
+  final int quantity;
+  final VoidCallback onDecrement;
+  final VoidCallback onIncrement;
+
+  const _CartStepper({
+    required this.quantity,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.cream,
+        borderRadius: BorderRadius.circular(AppRadii.pill),
+      ),
+      child: Column(
+        children: [
+          IconButton(
+            tooltip: 'Add one',
+            onPressed: onIncrement,
+            icon: const Icon(Icons.add_rounded),
+          ),
+          Text(
+            '$quantity',
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+          IconButton(
+            tooltip: 'Remove one',
+            onPressed: onDecrement,
+            icon: const Icon(Icons.remove_rounded),
+          ),
+        ],
       ),
     );
   }

@@ -1,37 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:food_express/models/restaurant.dart';
+import 'package:food_express/core/money.dart';
+import 'package:food_express/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 
-class MyReciept extends StatelessWidget {
-  const MyReciept({super.key});
+class MyReceipt extends StatelessWidget {
+  const MyReceipt({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 25, bottom: 25, top: 50),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    final cart = context.watch<CartProvider>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final item in cart.items)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Expanded(child: Text('${item.quantity} x ${item.foodName}')),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(formatKobo(item.lineTotalKobo)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        const Divider(),
+        Row(
           children: [
-            const Text("Thank you for your order!"),
-            const SizedBox(height: 25),
-            Container(
-              decoration: BoxDecoration(
-                border:
-                    Border.all(color: Theme.of(context).colorScheme.secondary),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              padding: const EdgeInsets.all(25),
-              child: Consumer<Restaurant>(
-                builder: (context, restuarant, child) =>
-                    Text(restuarant.displayCartReciept()),
+            const Text('Total'),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(formatKobo(cart.totalKobo)),
+                ),
               ),
             ),
-            const SizedBox(height: 25),
-            const Text("Estimated delivery time is: 4:10 PM"),
           ],
         ),
-      ),
+      ],
     );
   }
+}
+
+class MyReciept extends MyReceipt {
+  const MyReciept({super.key});
 }

@@ -1,306 +1,330 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:food_express/components/app_image.dart';
+import 'package:food_express/components/glass_surface.dart';
 import 'package:food_express/components/my_button.dart';
+import 'package:food_express/components/price_text.dart';
+import 'package:food_express/design/app_theme.dart';
 import 'package:food_express/models/food.dart';
-import 'package:food_express/models/restaurant.dart';
+import 'package:food_express/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
 
 class FoodPage extends StatefulWidget {
   final Food food;
-  final Map<Addon, bool> selectedAddons = {};
 
-  FoodPage({
+  const FoodPage({
     super.key,
     required this.food,
-  }) {
-    // initialize selected addons to be false
-    for (Addon addon in food.availableAddons) {
-      selectedAddons[addon] = false;
-    }
-  }
+  });
 
   @override
   State<FoodPage> createState() => _FoodPageState();
 }
 
-class _FoodPageState extends State<FoodPage> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+class _FoodPageState extends State<FoodPage> {
+  final Set<Addon> _selectedAddons = {};
   int _quantity = 1;
 
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeIn,
-      ),
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOut,
-      ),
-    );
-
-    _animationController.forward();
+  int get _unitTotal {
+    return widget.food.priceKobo +
+        _selectedAddons.fold<int>(0, (sum, addon) => sum + addon.priceKobo);
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void addToCart(Food food, Map<Addon, bool> selectedAddons) {
-    List<Addon> currentlySelectedAddons = [];
-    for (Addon addon in widget.food.availableAddons) {
-      if (widget.selectedAddons[addon] == true) {
-        currentlySelectedAddons.add(addon);
-      }
-    }
-
-    context.read<Restaurant>().addToCart(food, currentlySelectedAddons, _quantity);
-
-    // Show success snackbar
+  void _addToCart() {
+    context.read<CartProvider>().addFood(
+          widget.food,
+          _selectedAddons.toList(),
+          quantity: _quantity,
+        );
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.white),
-            const SizedBox(width: 8),
-            Text('${food.name} added to cart'),
-          ],
-        ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+      SnackBar(content: Text('${widget.food.name} added to cart')),
     );
-
     Navigator.pop(context);
   }
 
-  Widget _buildQuantitySelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        leading: IconButton.filledTonal(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back),
+        ),
+        actions: [
+          IconButton.filledTonal(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Favorites coming soon')),
+              );
+            },
+            icon: const Icon(Icons.favorite_border),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+        ],
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      body: Stack(
         children: [
-          IconButton(
-            icon: const Icon(Icons.remove),
-            onPressed: _quantity > 1
-                ? () => setState(() => _quantity--)
-                : null,
+          CustomScrollView(
+            slivers: [
+              SliverToBoxAdapter(
+                child: Stack(
+                  children: [
+                    AppImage(
+                      path: widget.food.imageUrl,
+                      height: 360,
+                      width: double.infinity,
+                    ),
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              AppColors.cream.withValues(alpha: 0.98),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      left: AppSpacing.lg,
+                      right: AppSpacing.lg,
+                      bottom: AppSpacing.lg,
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(AppRadii.lg),
+                          border: Border.all(color: AppColors.line),
+                          boxShadow: AppShadows.soft(AppColors.charcoal),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.food.name,
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(widget.food.description),
+                            const SizedBox(height: AppSpacing.md),
+                            const Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.sm,
+                              children: [
+                                _InfoPill(
+                                  icon: Icons.star_rounded,
+                                  label: '4.8 rated',
+                                ),
+                                _InfoPill(
+                                  icon: Icons.schedule_rounded,
+                                  label: '20-30 min',
+                                ),
+                                _InfoPill(
+                                  icon: Icons.delivery_dining_rounded,
+                                  label: 'Fast delivery',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            PriceText(
+                                amountKobo: widget.food.priceKobo,
+                                fontSize: 22),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                  120,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(AppRadii.lg),
+                        border: Border.all(color: AppColors.line),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Quantity',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const Spacer(),
+                          _Stepper(
+                            value: _quantity,
+                            onDecrement: _quantity == 1
+                                ? null
+                                : () => setState(() => _quantity--),
+                            onIncrement: () => setState(() => _quantity++),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text(
+                      'Add-ons',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.sm,
+                      children: widget.food.availableAddons.map((addon) {
+                        final selected = _selectedAddons.contains(addon);
+                        return FilterChip(
+                          selected: selected,
+                          label: Text(
+                              '${addon.name} • ₦${addon.priceKobo ~/ 100}'),
+                          onSelected: (value) {
+                            setState(() {
+                              if (value) {
+                                _selectedAddons.add(addon);
+                              } else {
+                                _selectedAddons.remove(addon);
+                              }
+                            });
+                          },
+                          selectedColor: AppColors.charcoal,
+                          backgroundColor: Colors.white,
+                          checkmarkColor: AppColors.gold,
+                          side: BorderSide(
+                            color:
+                                selected ? AppColors.charcoal : AppColors.line,
+                          ),
+                          labelStyle: TextStyle(
+                            color: selected ? Colors.white : AppColors.charcoal,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ]),
+                ),
+              ),
+            ],
           ),
-          Text(
-            '$_quantity',
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              top: false,
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: AppShadows.soft(AppColors.charcoal),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(28),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Total'),
+                          PriceText(amountKobo: _unitTotal * _quantity),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: PrimaryButton(
+                        text: 'Add to cart',
+                        icon: Icons.shopping_bag_outlined,
+                        onPressed: _addToCart,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => setState(() => _quantity++),
           ),
         ],
       ),
     );
   }
+}
+
+class _InfoPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoPill({
+    required this.icon,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Hero(
-                  tag: 'food-${widget.food.name}',
-                  child: Image.asset(
-                    widget.food.imagePath,
-                    height: 300,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      widget.food.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 24,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'N${widget.food.price}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                        color: Theme.of(context).colorScheme.primary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              _buildQuantitySelector(),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            widget.food.describtion,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          if (widget.food.availableAddons.isNotEmpty) ...[
-                            Divider(color: Theme.of(context).colorScheme.secondary),
-                            const SizedBox(height: 10),
-                            Text(
-                              "Add-ons",
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.inversePrimary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.secondary,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: EdgeInsets.zero,
-                                itemCount: widget.food.availableAddons.length,
-                                itemBuilder: (context, index) {
-                                  Addon addon = widget.food.availableAddons[index];
-                                  return CheckboxListTile(
-                                    title: Text(
-                                      addon.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      'N${addon.price}',
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.primary,
-                                      ),
-                                    ),
-                                    value: widget.selectedAddons[addon],
-                                    onChanged: (bool? value) {
-                                      setState(() {
-                                        widget.selectedAddons[addon] = value!;
-                                      });
-                                    },
-                                    activeColor: Theme.of(context).colorScheme.primary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 25),
-                MyButton(
-                  onTap: () => addToCart(widget.food, widget.selectedAddons),
-                  text: "Add to cart",
-                ),
-                const SizedBox(height: 25),
-              ],
-            ),
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 6,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.cream,
+        borderRadius: BorderRadius.circular(AppRadii.pill),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: AppColors.success),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w800),
           ),
-        ),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.8),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_rounded),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.8),
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.favorite_border),
-                    onPressed: () {
-                      // TODO: Implement favorite functionality
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Added to favorites'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Stepper extends StatelessWidget {
+  final int value;
+  final VoidCallback? onDecrement;
+  final VoidCallback onIncrement;
+
+  const _Stepper({
+    required this.value,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassSurface(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      radius: AppRadii.pill,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: onDecrement,
+            icon: const Icon(Icons.remove),
           ),
-        ),
-      ],
+          Text('$value', style: Theme.of(context).textTheme.titleMedium),
+          IconButton(
+            onPressed: onIncrement,
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
     );
   }
 }

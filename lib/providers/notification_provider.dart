@@ -1,65 +1,52 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import '../services/notification_service.dart';
+import 'package:food_express/models/app_notification.dart';
+import 'package:food_express/repositories/notification_repository.dart';
 
-class NotificationProvider with ChangeNotifier {
-  final NotificationService _notificationService = NotificationService();
-  final List<Map<String, dynamic>> _notifications = [];
-  bool _hasUnreadNotifications = false;
+class NotificationProvider extends ChangeNotifier {
+  NotificationProvider({
+    NotificationRepository? repository,
+    bool firebaseEnabled = true,
+  }) : _repository = repository ??
+            NotificationRepository(firebaseEnabled: firebaseEnabled);
 
-  List<Map<String, dynamic>> get notifications => _notifications;
-  bool get hasUnreadNotifications => _hasUnreadNotifications;
+  final NotificationRepository _repository;
+  StreamSubscription<List<AppNotification>>? _subscription;
+  List<AppNotification> _notifications = const [];
 
-  Future<void> initialize() async {
-    await _notificationService.initialize();
-  }
+  List<AppNotification> get notifications => List.unmodifiable(_notifications);
+  bool get hasUnreadNotifications =>
+      _notifications.any((notification) => !notification.isRead);
 
-  void addNotification({
-    required String title,
-    required String body,
-    required String type,
-    Map<String, dynamic>? data,
-  }) {
-    _notifications.insert(
-      0,
-      {
-        'title': title,
-        'body': body,
-        'type': type,
-        'data': data,
-        'timestamp': DateTime.now(),
-        'isRead': false,
+  void watchForUser(String? userId) {
+    _subscription?.cancel();
+    if (userId == null) {
+      _notifications = const [];
+      notifyListeners();
+      return;
+    }
+    _subscription = _repository.watchUserNotifications(userId).listen(
+      (notifications) {
+        _notifications = notifications;
+        notifyListeners();
+      },
+      onError: (Object error) {
+        debugPrint('Notification stream error: $error');
       },
     );
-    _hasUnreadNotifications = true;
-    notifyListeners();
-
-    // Show system notification
-    _notificationService.showOrderStatusNotification(
-      title: title,
-      body: body,
-      status: type,
-    );
   }
 
-  void markAsRead(int index) {
-    if (index >= 0 && index < _notifications.length) {
-      _notifications[index]['isRead'] = true;
-      _hasUnreadNotifications = _notifications.any((n) => !n['isRead']);
-      notifyListeners();
-    }
-  }
+  Future<void> markAsRead(String id) => _repository.markAsRead(id);
+  Future<void> markAllAsRead() => _repository.markAllAsRead(_notifications);
+  Future<void> deleteNotification(String id) =>
+      _repository.deleteNotification(id);
+  Future<void> clearNotifications() =>
+      _repository.clearNotifications(_notifications);
 
-  void markAllAsRead() {
-    for (var notification in _notifications) {
-      notification['isRead'] = true;
-    }
-    _hasUnreadNotifications = false;
-    notifyListeners();
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
-
-  void clearNotifications() {
-    _notifications.clear();
-    _hasUnreadNotifications = false;
-    notifyListeners();
-  }
-} 
+}

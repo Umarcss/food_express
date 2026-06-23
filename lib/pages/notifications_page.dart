@@ -1,138 +1,151 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:food_express/components/empty_state.dart';
+import 'package:food_express/design/app_theme.dart';
+import 'package:food_express/models/app_notification.dart';
+import 'package:food_express/providers/notification_provider.dart';
 import 'package:intl/intl.dart';
-import '../providers/notification_provider.dart';
+import 'package:provider/provider.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NotificationProvider>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
         actions: [
           IconButton(
+            tooltip: 'Mark all read',
+            onPressed:
+                provider.notifications.isEmpty ? null : provider.markAllAsRead,
             icon: const Icon(Icons.done_all),
-            onPressed: () {
-              context.read<NotificationProvider>().markAllAsRead();
-            },
           ),
           IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Clear Notifications'),
-                  content: const Text(
-                      'Are you sure you want to clear all notifications?'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        context
-                            .read<NotificationProvider>()
-                            .clearNotifications();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Clear'),
-                    ),
-                  ],
-                ),
-              );
-            },
+            tooltip: 'Clear notifications',
+            onPressed: provider.notifications.isEmpty
+                ? null
+                : provider.clearNotifications,
+            icon: const Icon(Icons.delete_outline),
           ),
         ],
       ),
-      body: Consumer<NotificationProvider>(
-        builder: (context, provider, child) {
-          if (provider.notifications.isEmpty) {
-            return const Center(
-              child: Text('No notifications yet'),
-            );
-          }
+      body: provider.notifications.isEmpty
+          ? const EmptyState(
+              icon: Icons.notifications_none,
+              title: 'No notifications yet',
+              message: 'Order updates and offers will show up here.',
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              itemCount: provider.notifications.length,
+              itemBuilder: (context, index) {
+                final notification = provider.notifications[index];
+                return Dismissible(
+                  key: ValueKey(notification.id),
+                  direction: DismissDirection.endToStart,
+                  onDismissed: (_) =>
+                      provider.deleteNotification(notification.id),
+                  background: Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(right: AppSpacing.lg),
+                    color: AppColors.danger,
+                    child:
+                        const Icon(Icons.delete_outline, color: Colors.white),
+                  ),
+                  child: _NotificationCard(notification: notification),
+                );
+              },
+            ),
+    );
+  }
+}
 
-          return ListView.builder(
-            itemCount: provider.notifications.length,
-            itemBuilder: (context, index) {
-              final notification = provider.notifications[index];
-              return Dismissible(
-                key: Key(notification['timestamp'].toString()),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 16),
-                  child: const Icon(
-                    Icons.delete,
-                    color: Colors.white,
-                  ),
+class _NotificationCard extends StatelessWidget {
+  final AppNotification notification;
+
+  const _NotificationCard({required this.notification});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        border: Border.all(
+          color: notification.isRead ? AppColors.line : AppColors.gold,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.lg),
+        onTap: () =>
+            context.read<NotificationProvider>().markAsRead(notification.id),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor:
+                    notification.isRead ? AppColors.cream : AppColors.gold,
+                child: Icon(
+                  _iconFor(notification.type),
+                  color: AppColors.charcoal,
                 ),
-                onDismissed: (direction) {
-                  provider.notifications.removeAt(index);
-                  provider.notifyListeners();
-                },
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: notification['isRead']
-                        ? Colors.grey
-                        : Theme.of(context).colorScheme.primary,
-                    child: Icon(
-                      _getNotificationIcon(notification['type']),
-                      color: Colors.white,
-                    ),
-                  ),
-                  title: Text(
-                    notification['title'],
-                    style: TextStyle(
-                      fontWeight: notification['isRead']
-                          ? FontWeight.normal
-                          : FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(notification['body']),
-                      Text(
-                        DateFormat('MMM d, y • h:mm a')
-                            .format(notification['timestamp']),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      notification.title,
+                      style: TextStyle(
+                        fontWeight: notification.isRead
+                            ? FontWeight.w700
+                            : FontWeight.w900,
                       ),
-                    ],
-                  ),
-                  onTap: () {
-                    provider.markAsRead(index);
-                    // TODO: Handle notification tap based on type
-                  },
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      notification.body,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      DateFormat('MMM d, h:mm a')
+                          .format(notification.createdAt),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
                 ),
-              );
-            },
-          );
-        },
+              ),
+              if (!notification.isRead)
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: const BoxDecoration(
+                    color: AppColors.success,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  IconData _getNotificationIcon(String type) {
+  IconData _iconFor(String type) {
     switch (type) {
       case 'order':
-        return Icons.shopping_bag;
-      case 'favorite':
-        return Icons.favorite;
+        return Icons.shopping_bag_outlined;
       case 'promo':
-        return Icons.local_offer;
-      case 'system':
-        return Icons.info;
+        return Icons.local_offer_outlined;
       default:
-        return Icons.notifications;
+        return Icons.notifications_outlined;
     }
   }
 }

@@ -1,11 +1,4 @@
 import 'package:flutter/material.dart';
+import 'package:food_express/design/app_theme.dart';
 
-ThemeData lightMode = ThemeData(
-  colorScheme: ColorScheme.light(
-    surface: Colors.grey.shade300,
-    primary: Colors.grey.shade500,
-    secondary: Colors.grey.shade500,
-    tertiary: Colors.white,
-    inversePrimary: Colors.grey.shade700,
-  )
-);
+ThemeData lightMode = AppTheme.light();

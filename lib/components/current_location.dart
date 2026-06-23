@@ -5,27 +5,27 @@ class CurrentLocation extends StatelessWidget {
 
   void openLocatiionSearchBox(BuildContext context) {
     showDialog(
-      context: context, 
+      context: context,
       builder: (context) => AlertDialog(
         title: const Text("Your Location"),
         content: const TextField(
           decoration: InputDecoration(hintText: "Search address here.."),
         ),
         actions: [
-          // cancel button 
+          // cancel button
           MaterialButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
-            ),
+          ),
 
-          // save button 
-            MaterialButton(
+          // save button
+          MaterialButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Save'),
-            ),
+          ),
         ],
       ),
-      ); 
+    );
   }
 
   @override
@@ -35,23 +35,25 @@ class CurrentLocation extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Deliver now",
-           style: TextStyle(color: Theme.of(context).colorScheme.primary),
-           ),
+          Text(
+            "Deliver now",
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
           GestureDetector(
             onTap: () => openLocatiionSearchBox(context),
             child: Row(
               children: [
-                // address 
-                Text("25 abuja road", 
-                 style: TextStyle(color: Theme.of(context).colorScheme.inversePrimary,
-                 fontWeight: FontWeight.bold,
-                 ),
+                // address
+                Text(
+                  "25 abuja road",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                  
-                // drop down menu 
+
+                // drop down menu
                 const Icon(Icons.keyboard_arrow_down_rounded),
-                  
               ],
             ),
           ),

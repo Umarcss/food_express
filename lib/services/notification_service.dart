@@ -83,7 +83,7 @@ class NotificationService {
 
   Future<void> _playNotificationSound() async {
     try {
-      await _audioPlayer.play(AssetSource('sounds/notification_sound.mp3'));
+      await _audioPlayer.play(AssetSource('sounds/notification_sound.mp3.mp3'));
     } catch (e) {
       debugPrint('Error playing notification sound: $e');
     }
